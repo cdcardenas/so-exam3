@@ -155,4 +155,7 @@ Funcionamiento Uchiwa
 
      
 
-  
+[1]: images/rabbit.png
+[2]: images/rabbit2.png
+[3]: images/uchiwa.png
+[4]: images/uchiwa2.png
