@@ -149,13 +149,165 @@ Funcionamiento Uchiwa
 ![][3]
 ![][4]
 
+Para la evidencia de caida del servicio se utilizo la herramienta de creacion de gif para la captura de un corto video que evidencia la caida de un servicio y su alerta respectiva mediante Uchiwa dashboard
+
+![][5]
 
 
+7 para la instalacion de stack ELK(elasticsearch, logstash, kibana, filebeat en el client)) se utilizaron los siguientes comandos:
+
+     yum install java-1.8.0-openjdk.x86_64
+
+--ELASTICSEARCH--
+
+con ese comando se instala el jdk 1.8.0 de java y posteriormente se debe instalar y configurar la llave publica de elasticsearch
+
+     rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+   
+luego en la siguiente direccion creamos un archivo .repo que contendra el repositorio de elasticsearch
+
+     vi /etc/yum.repos.d/elasticsearch.repo
      
+luego en este archivo escribimos:
 
+     [elasticsearch-5.x]
+     name=Elasticsearch repository for 5.x packages
+     baseurl=https://artifacts.elastic.co/packages/5.x/yum
+     gpgcheck=1
+     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+     enabled=1
+     autorefresh=1
+     type=rpm-md
      
+Ahora que ya tenemos el repositorio listo. procedemos a instalar elasticsearch
+
+     yum install elasticsearch -y
+     
+--LONGSTASH--
+
+como se hizo para elasticsearch, para longstash debemos crear un archivo que contenga el repositorio de longstash
+
+     vi /etc/yum.repos.d/logstash.repo
+     
+y escribimos en el documento:
+
+     [logstash-5.x]
+     name=Elastic repository for 5.x packages
+     baseurl=https://artifacts.elastic.co/packages/5.x/yum
+     gpgcheck=1
+     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+     enabled=1
+     autorefresh=1
+     type=rpm-md
+
+guardamos el achivo con :x e instalamos longstash mediante el comando:
+
+     yum install logstash -y
+
+--INSTALACIÓN KIBANA--
+
+siguiendo la misma estructura de los anteriores servicios del stack ELK
+
+     vi /etc/yum.repos.d/kibana.repo
+     
+dentro del editor escribimos:
+
+     [kibana-5.x]
+     name=Kibana repository for 5.x packages
+     baseurl=https://artifacts.elastic.co/packages/5.x/yum
+     gpgcheck=1
+     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+     enabled=1
+     autorefresh=1
+     type=rpm-md
+
+instalamos Kibana con :
+
+     yum install kibana -y
+     
+--FILEBEAT--
+
+
+Llave publica:
+
+     sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+     
+repositorio:
+
+     vi /etc/yum.repos.d/elastic.repo
+     
+     [elastic-5.x]
+     name=Elastic repository for 5.x packages
+     baseurl=https://artifacts.elastic.co/packages/5.x/yum
+     gpgcheck=1
+     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+     enabled=1
+     autorefresh=1
+     type=rpm-md
+
+para terminar, instalamos 
+
+     sudo yum install filebeat -y
+     
+     
+     
+     
+     
+Para verificar el correcto funcionamiento del stack, se verifico usando el ejemplo 0 en el gist del profesor Daniel Barragán, ubicado en la siguiente url: gist.github.com/d4n13lbc/be1ad5039dff1c058b335482488d4965
+
+Abrimos los siguientes puertos:
+
+     firewall-cmd --zone=public --add-port=9200/tcp --permanent
+     firewall-cmd --reload
+
+para la prueba con este ejemplo se debe editar la configuracion del archivo elasticsearch.yml
+
+     vi /etc/elasticsearch/elasticsearch.yml
+     
+ agregamos los siguientes cambios:
+ 
+     # Set the bind address to a specific IP (IPv4 or IPv6):
+     network.host: 192.168.57.5
+     # Set a custom port for HTTP:
+     http.port: 9200
+     
+     
+Para Kibana tambien debemos, editar la configuración y abrir los siguientes puertos:
+
+     firewall-cmd --zone=public --add-port=5601/tcp --permanent
+     firewall-cmd --reload
+
+Editamos el siguiente archivo:
+
+     vi /etc/kibana/kibana.yml
+     
+agregamos los siguientes cambios
+
+     # Kibana is served by a back end server. This setting specifies the port to use.
+     server.port: 5601
+     # To allow connections from remote users, set this parameter to a non-loopback address.
+     server.host: "192.168.57.5"
+     # The URL of the Elasticsearch instance to use for all your queries.
+     elasticsearch.url: "http://192.168.57.5:9200
+
+Ahora para la prueba iniciamos Kibana y elasticsearch
+
+     service kibana start
+     service elasticsearch start
+     
+ 
+Pruebas de funcionamiento:
+
+![][6]
+![][7]
+
+
+
 
 [1]: images/rabbit.png
 [2]: images/rabbit2.png
 [3]: images/uchiwa.png
 [4]: images/uchiwa2.png
+[5]: images/parcial3GrupoChristianJorgeyRay.gif
+[6]: images/datos.png
+[7]: images/kibana.png
